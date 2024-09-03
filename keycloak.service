@@ -1,0 +1,57 @@
+[Unit]
+Description=Red Hat build of Keycloak
+Documentation=https://access.redhat.com/documentation/ja-jp/red_hat_build_of_keycloak/
+After=network.target
+
+[Service]
+Type=exec
+
+WorkingDirectory = /opt/keycloak/rhbk-24.0.6
+
+Environment = JAVA_HOME=/usr/lib/jvm/java-17
+Environment = JAVA_OPTS="\
+  -XX:InitialRAMPercentage=10 -XX:MaxRAMPercentage=10 \
+  -XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/urandom \
+  # GC log
+  -Xlog:gc*:file=./data/log/gc.log:time,uptimemillis:filecount=5,filesize=3M \
+  # SSL debug log
+  #-Djavax.net.debug=ssl,handshake \
+"
+
+#Environment = KEYCLOAK_ADMIN=admin
+#Environment = KEYCLOAK_ADMIN_PASSWORD=password
+
+Environment = KC_HOSTNAME=localhost
+#Environment = KC_HTTPS_PORT=18443
+#Environment = KC_HTTPS_CERTIFICATE_FILE=/path/to/server.crt.pem
+#Environment = KC_HTTPS_CERTIFICATE_KEY_FILE=/path/to/server.key.pem
+
+Environment = KC_DB=postgres
+Environment = KC_DB_USERNAME=keycloak
+Environment = KC_DB_PASSWORD=password
+Environment = KC_DB_URL=jdbc:postgresql://localhost:5432/keycloak
+
+Environment = KC_CACHE_CONFIG_FILE=cache-ispn-jdbcping.xml
+
+Environment = KC_HEALTH_ENABLED=true
+Environment = KC_METRICS_ENABLED=true
+
+Environment = KC_SPI_STICKY_SESSION_ENCODER_INFINISPAN_SHOULD_ATTACH_ROUTE=false
+
+ExecStartPre = mkdir -p ./data/log
+ExecStartPre = rm -rf ./data/tmp/kc-gzip-cache
+ExecStartPre = ls -al ./providers
+ExecStartPre = ls -al ./conf
+ExecStartPre = sh -c "exec ./bin/kc.sh build"
+
+ExecStart = sh -c "exec ./bin/kc.sh start"
+SuccessExitStatus=143
+
+User=keycloak
+Group=keycloak
+
+LimitNOFILE=infinity
+LimitNPROC=infinity
+
+[Install]
+WantedBy=multi-user.target
