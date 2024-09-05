@@ -54,8 +54,12 @@ bin/kc.sh start --https-certificate-file=/path/to/certfile.pem --https-certifica
 - Keycloakの設定は環境変数を使用
   - Keycloakの設定項目はコマンドラインオプション、環境変数、conf/keycloak.confの順で優先順位を持つ（最初の方が優先で後の方の設定を上書きできる）
   - せっかくSystemdのユニットファイルを用意するので、必要な設定をそこで環境変数にて設定する
+  - JDBC_PINGの設定を行うキャッシュ定義のXMLファイルはInfinispanの設定であってKeycloakの設定ではないのでコマンドラインオプションやkeycloak.confの内容は見ることができないが、環境変数なら見れる
   - conf/keycloak.confを使っていけない訳では全くない
     - Systemd管理外で起動する場合に使うオプションを conf/keycloak.conf に書いておき、上書き設定したいものをユニットファイルの環境変数で設定するといった使い分けが可能
+- レルムの自動インポートも可能
+  - このレポジトリでは使っていないが、 conf/import/ 内にレルムのJSONファイルを置くことで起動時に自動インポートさせることも可能
+    - https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/24.0/html-single/server_guide/index#importExport-importing-a-realm-during-startup
 
 ```shell
 # root権限で作業する
