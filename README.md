@@ -57,9 +57,13 @@ bin/kc.sh start --https-certificate-file=/path/to/certfile.pem --https-certifica
   - JDBC_PINGの設定を行うキャッシュ定義のXMLファイルはInfinispanの設定であってKeycloakの設定ではないのでコマンドラインオプションやkeycloak.confの内容を見ることはできないが、環境変数なら見れる
   - conf/keycloak.confを使っていけない訳では全くない
     - Systemd管理外で起動する場合に使うオプションを conf/keycloak.conf に書いておき、上書き設定したいものをユニットファイルの環境変数で設定するといった使い分けが可能
+    - `kc.sh export` を実行する際は、正しいDBに接続するために conf/keycloak.conf にDB接続情報を書いておいた方が楽になる
 - レルムの自動インポートも可能
-  - このレポジトリでは使っていないが、 data/import/ 内にレルムのJSONファイルを置くことで起動時に自動インポートさせることも可能
+  - data/import/ 内にレルムのJSONファイルを置き、`--import-realm` オプションを追加することで起動時に自動インポートさせることも可能
     - https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/24.0/html-single/server_guide/index#importExport-importing-a-realm-during-startup
+  - 同名のレルムが存在する場合はインポートしない
+  - レルムのJSONファイルは部分的なものでもよく、またパスワードは平文であってもよい
+    - https://github.com/keycloak/keycloak/blob/18.0.2/examples/js-console/example-realm.json
 
 ```shell
 # root権限で作業する

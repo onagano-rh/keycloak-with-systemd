@@ -23,10 +23,11 @@
 
     <jgroups>
         <stack name="my-tcp" extends="tcp">
+	    <!-- JDBC_PING2 is probably better: https://github.com/keycloak/keycloak/discussions/29205 -->
             <JDBC_PING
                 connection_driver="org.postgresql.Driver"
-                connection_username="${env.KC_DB_USERNAME}"
-                connection_password="${env.KC_DB_PASSWORD}"
+                connection_username="${env.KC_DB_USERNAME:keycloak}"
+                connection_password="${env.KC_DB_PASSWORD:password}"
                 connection_url="${env.KC_DB_URL:jdbc:postgresql://localhost:5432/keycloak}"
                 initialize_sql="CREATE TABLE IF NOT EXISTS JGROUPSPING (own_addr varchar(200) NOT NULL, cluster_name varchar(200) NOT NULL, ping_data BYTEA, constraint PK_JGROUPSPING PRIMARY KEY (own_addr, cluster_name))"
                 insert_single_sql="INSERT INTO JGROUPSPING (own_addr, cluster_name, ping_data) values (?, ?, ?)"
@@ -40,17 +41,17 @@
     	</stack>
     </jgroups>
 
-    <cache-container name="keycloak">
+    <cache-container name="keycloak" statistics="true">
         <transport lock-timeout="60000" stack="my-tcp"/>
         <metrics names-as-tags="true" />
-        <local-cache name="realms" simple-cache="true">
+        <local-cache name="realms" simple-cache="true" statistics="true">
             <encoding>
                 <key media-type="application/x-java-object"/>
                 <value media-type="application/x-java-object"/>
             </encoding>
             <memory max-count="10000"/>
         </local-cache>
-        <local-cache name="users" simple-cache="true">
+        <local-cache name="users" simple-cache="true" statistics="true">
             <encoding>
                 <key media-type="application/x-java-object"/>
                 <value media-type="application/x-java-object"/>
@@ -60,32 +61,32 @@
         <distributed-cache name="sessions" owners="2" statistics="true">
             <expiration lifespan="-1"/>
         </distributed-cache>
-        <distributed-cache name="authenticationSessions" owners="2">
+        <distributed-cache name="authenticationSessions" owners="2" statistics="true">
             <expiration lifespan="-1"/>
         </distributed-cache>
-        <distributed-cache name="offlineSessions" owners="2">
+        <distributed-cache name="offlineSessions" owners="2" statistics="true">
             <expiration lifespan="-1"/>
         </distributed-cache>
-        <distributed-cache name="clientSessions" owners="2">
+        <distributed-cache name="clientSessions" owners="2" statistics="true">
             <expiration lifespan="-1"/>
         </distributed-cache>
-        <distributed-cache name="offlineClientSessions" owners="2">
+        <distributed-cache name="offlineClientSessions" owners="2" statistics="true">
             <expiration lifespan="-1"/>
         </distributed-cache>
-        <distributed-cache name="loginFailures" owners="2">
+        <distributed-cache name="loginFailures" owners="2" statistics="true">
             <expiration lifespan="-1"/>
         </distributed-cache>
-        <local-cache name="authorization" simple-cache="true">
+        <local-cache name="authorization" simple-cache="true" statistics="true">
             <encoding>
                 <key media-type="application/x-java-object"/>
                 <value media-type="application/x-java-object"/>
             </encoding>
             <memory max-count="10000"/>
         </local-cache>
-        <replicated-cache name="work">
+        <replicated-cache name="work" statistics="true">
             <expiration lifespan="-1"/>
         </replicated-cache>
-        <local-cache name="keys" simple-cache="true">
+        <local-cache name="keys" simple-cache="true" statistics="true">
             <encoding>
                 <key media-type="application/x-java-object"/>
                 <value media-type="application/x-java-object"/>
@@ -93,7 +94,7 @@
             <expiration max-idle="3600000"/>
             <memory max-count="1000"/>
         </local-cache>
-        <distributed-cache name="actionTokens" owners="2">
+        <distributed-cache name="actionTokens" owners="2" statistics="true">
             <encoding>
                 <key media-type="application/x-java-object"/>
                 <value media-type="application/x-java-object"/>

@@ -44,7 +44,7 @@ ExecStartPre = ls -al ./providers
 ExecStartPre = ls -al ./conf
 ExecStartPre = sh -c "exec ./bin/kc.sh build"
 
-ExecStart = sh -c "exec ./bin/kc.sh start"
+ExecStart = sh -c "exec ./bin/kc.sh start --import-realm"
 SuccessExitStatus=143
 
 User=keycloak
