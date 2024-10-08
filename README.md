@@ -82,9 +82,8 @@ bin  conf  lib  LICENSE.txt  providers  README.md  themes  version.txt
 $ cd /opt/keycloak/rhbk-24.0.6
 
 # 本リポジトリのファイルをコピー
-$ cp conf/cache-ispn-jdbcping.xml conf/
-$ cp conf/quarkus.properties conf/
-$ cp keycloak.service .
+$ cp /path/to/conf/* conf/
+$ cp /path/to/keycloak.service .
 
 # カスタマイズがある場合はそれらもコピー
 $ cp /path/to/*.jar providers/

@@ -14,8 +14,8 @@ Environment = JAVA_OPTS="\
   -XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/urandom \
   # GC log
   -Xlog:gc*:file=./data/log/gc.log:time,uptimemillis:filecount=5,filesize=3M \
-  # SSL debug log
-  #-Djavax.net.debug=ssl,handshake \
+  # SSL debug log (empty value, "", to use system logger)
+  -Djavax.net.debug= \
 "
 
 #Environment = KEYCLOAK_ADMIN=admin
@@ -37,6 +37,9 @@ Environment = KC_HEALTH_ENABLED=true
 Environment = KC_METRICS_ENABLED=true
 
 Environment = KC_SPI_STICKY_SESSION_ENCODER_INFINISPAN_SHOULD_ATTACH_ROUTE=false
+
+Environment = KC_LOG=console,file
+Environment = KC_LOG_FILE=./data/log/keycloak.log
 
 ExecStartPre = mkdir -p ./data/log
 ExecStartPre = rm -rf ./data/tmp/kc-gzip-cache
