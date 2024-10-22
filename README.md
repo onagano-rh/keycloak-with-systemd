@@ -127,3 +127,20 @@ Keycloak側はプロキシモードを "edge" もしくは "reencrypt" にする
 - 管理コンソール (/admin) に対してはホスト名ベースのアクセス制限なら `hostname-admin` オプションで設定可能
   - https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/24.0/html/server_guide/hostname-#hostname-administration-console
 
+## 古いログファイルの削除方法について
+
+KeycloakのベースであるQuarkusが採用しているロギングライブラリであるJBoss Log Managerは
+同一プレフィクスのファイル数を制限する機能 (max-backup-size) は持っているが、
+（LogbackのmaxHistoryのような）古いファイルを削除する機能は持っていない。
+
+[LOGMGR-139](https://issues.redhat.com/browse/LOGMGR-139) をはじめ古くから機能追加のリクエストは上がっているが、
+ファイル名ベースの判断の不安定性やローテート時のロックの問題などを理由にCRONなど他の機構に頼る方がいいとしている。
+
+Systemdの使える環境ではCRONよりもSystemd timerの方が使い勝手がいい（[参考URL](https://opensource.com/article/20/7/systemd-timers)）。
+週次ベースで削除を行うユニットファイルを参考として置いてある。
+
+```
+systemctl enable ./keycloak-log-delete.service
+systemctl enable ./keycloak-log-delete.timer
+systemctl start keycloak-log-delete.timer
+```

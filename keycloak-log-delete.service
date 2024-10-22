@@ -1,0 +1,16 @@
+[Unit]
+Description=Delete Keycloak log files
+Wants=keycloak-log-delete.timer
+
+[Service]
+Type=oneshot
+
+WorkingDirectory = /opt/keycloak/rhbk-24.0.6
+
+ExecStart= du -hs ./data/log
+ExecStart= find   ./data/log -type f -mtime +7 -ls -exec rm {} \;
+ExecStart= du -hs ./data/log
+
+[Install]
+WantedBy=multi-user.target
+
