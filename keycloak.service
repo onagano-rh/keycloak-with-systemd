@@ -9,6 +9,7 @@ Type=exec
 WorkingDirectory = /opt/keycloak/rhbk-24.0.6
 
 Environment = JAVA_HOME=/usr/lib/jvm/java-17
+# Override default values in kc.sh
 Environment = JAVA_OPTS="\
   -XX:InitialRAMPercentage=10 -XX:MaxRAMPercentage=10 \
   -XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/urandom \
@@ -17,29 +18,48 @@ Environment = JAVA_OPTS="\
   # SSL debug log (empty value, "", to use system logger)
   -Djavax.net.debug= \
 "
+# Other JVM options: define bind_addr if you have multiple NICs
+#Environment = JAVA_OPTS_APPEND=-Djgroups.bind_addr=192.168.1.10
 
+# Initial admin password
 #Environment = KEYCLOAK_ADMIN=admin
 #Environment = KEYCLOAK_ADMIN_PASSWORD=password
 
-Environment = KC_HOSTNAME=localhost
-#Environment = KC_HTTPS_PORT=18443
-#Environment = KC_HTTPS_CERTIFICATE_FILE=/path/to/server.crt.pem
-#Environment = KC_HTTPS_CERTIFICATE_KEY_FILE=/path/to/server.key.pem
-
+# DB info
 Environment = KC_DB=postgres
 Environment = KC_DB_USERNAME=keycloak
 Environment = KC_DB_PASSWORD=password
 Environment = KC_DB_URL=jdbc:postgresql://localhost:5432/keycloak
 
-Environment = KC_CACHE_CONFIG_FILE=cache-ispn-jdbcping.xml
+# Sizing (as well as JVM heap size)
+Environment = KC_DB_POOL_MAX_SIZE=100
+Environment = QUARKUS_THREAD_POOL_MAX_THREADS=100
+#Environment = QUARKUS_THREAD_POOL_QUEUE_SIZE=50
+LimitNOFILE=infinity
+LimitNPROC=infinity
 
+# HTTPS
+Environment = KC_HOSTNAME=localhost
+#Environment = KC_HTTPS_PORT=18443
+#Environment = KC_HTTPS_CERTIFICATE_FILE=/path/to/server.crt.pem
+#Environment = KC_HTTPS_CERTIFICATE_KEY_FILE=/path/to/server.key.pem
+
+# Clustering
+Environment = KC_CACHE_CONFIG_FILE=cache-ispn-jdbcping.xml
+Environment = KC_SPI_STICKY_SESSION_ENCODER_INFINISPAN_SHOULD_ATTACH_ROUTE=false
+#Environment = KC_PROXY=passthrough
+
+# Features
 Environment = KC_HEALTH_ENABLED=true
 Environment = KC_METRICS_ENABLED=true
+#Environment = KC_FEATURES_DISABLED=account-api,account2
 
-Environment = KC_SPI_STICKY_SESSION_ENCODER_INFINISPAN_SHOULD_ATTACH_ROUTE=false
-
+# Logging (with quarkus.properties)
 Environment = KC_LOG=console,file
 Environment = KC_LOG_FILE=./data/log/keycloak.log
+
+User=keycloak
+Group=keycloak
 
 ExecStartPre = mkdir -p ./data/log
 ExecStartPre = rm -rf ./data/tmp/kc-gzip-cache
@@ -50,11 +70,5 @@ ExecStartPre = sh -c "exec ./bin/kc.sh build"
 ExecStart = sh -c "exec ./bin/kc.sh start --import-realm"
 SuccessExitStatus=143
 
-User=keycloak
-Group=keycloak
-
-LimitNOFILE=infinity
-LimitNPROC=infinity
-
 [Install]
-WantedBy=multi-user.target
+WantedBy=multi-user.target default.target
