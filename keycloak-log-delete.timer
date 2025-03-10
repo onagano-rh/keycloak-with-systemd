@@ -6,7 +6,7 @@ Requires=keycloak-log-delete.service
 
 [Timer]
 Unit=keycloak-log-delete.service
-AccuracySec=1hour
+RandomizedDelaySec=1hour
 OnCalendar=weekly
 
 [Install]
