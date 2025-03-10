@@ -15,8 +15,6 @@ Environment = JAVA_OPTS="\
   -XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/urandom \
   # GC log
   -Xlog:gc*:file=./data/log/gc.log:time,uptimemillis:filecount=5,filesize=3M \
-  # SSL debug log (empty value, "", to use system logger)
-  -Djavax.net.debug= \
 "
 # Other JVM options: define bind_addr if you have multiple NICs
 #Environment = JAVA_OPTS_APPEND=-Djgroups.bind_addr=192.168.1.10
