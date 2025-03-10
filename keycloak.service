@@ -6,7 +6,7 @@ After=network.target
 [Service]
 Type=exec
 
-WorkingDirectory = /opt/keycloak/rhbk-24.0.6
+WorkingDirectory = /opt/keycloak/rhbk-26.0.9
 
 Environment = JAVA_HOME=/usr/lib/jvm/java-17
 # Override default values in kc.sh
@@ -20,8 +20,8 @@ Environment = JAVA_OPTS="\
 #Environment = JAVA_OPTS_APPEND=-Djgroups.bind_addr=192.168.1.10
 
 # Initial admin password
-#Environment = KEYCLOAK_ADMIN=admin
-#Environment = KEYCLOAK_ADMIN_PASSWORD=password
+#Environment = KC_BOOTSTRAP_ADMIN_USERNAME=admin
+#Environment = KC_BOOTSTRAP_ADMIN_PASSWORD=password
 
 # DB info
 Environment = KC_DB=postgres
@@ -31,8 +31,8 @@ Environment = KC_DB_URL=jdbc:postgresql://localhost:5432/keycloak
 
 # Sizing (as well as JVM heap size)
 Environment = KC_DB_POOL_MAX_SIZE=100
-Environment = QUARKUS_THREAD_POOL_MAX_THREADS=100
-#Environment = QUARKUS_THREAD_POOL_QUEUE_SIZE=50
+Environment = KC_HTTP_POOL_MAX_THREADS=100
+#Environment = KC_HTTP_MAX_QUEUED_REQUESTS=50
 LimitNOFILE=infinity
 LimitNPROC=infinity
 
@@ -45,7 +45,7 @@ Environment = KC_HOSTNAME=localhost
 # Clustering
 Environment = KC_CACHE_CONFIG_FILE=cache-ispn-jdbcping.xml
 Environment = KC_SPI_STICKY_SESSION_ENCODER_INFINISPAN_SHOULD_ATTACH_ROUTE=false
-#Environment = KC_PROXY=passthrough
+#Environment = KC_PROXY_HEADERS=xforwarded
 
 # Features
 Environment = KC_HEALTH_ENABLED=true
