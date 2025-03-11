@@ -55,13 +55,10 @@ bin/kc.sh start --https-certificate-file=/path/to/certfile.pem --https-certifica
   - UDPマルチキャストの代わりにJDBC_PINGを設定し、上記で用意した同じPostgreSQLを使うよう設定する。この場合は同じDBを設定したKeycloakがクラスタメンバーとなる
     - 参考までに Keycloak 26.1 からはJDBC_PINGがデフォルトになり、クラスタリングのためにcache-ispn.xmlを編集することは不要になる予定
 - Systemdのサービスとして起動
-- Keycloakの設定は環境変数を使用
+- Keycloakの設定は keycloak.conf を使用
   - Keycloakの設定項目はコマンドラインオプション、環境変数、conf/keycloak.confの順で優先順位を持つ（最初の方が優先で後の方の設定を上書きできる）
-  - せっかくSystemdのユニットファイルを用意するので、必要な設定をそこで環境変数にて設定する
-  - JDBC_PINGの設定を行うキャッシュ定義のXMLファイルはInfinispanの設定であってKeycloakの設定ではないのでコマンドラインオプションやkeycloak.confの内容を見ることはできないが、環境変数なら見れる
-  - conf/keycloak.confを使っていけない訳では全くない
-    - Systemd管理外で起動する場合に使うオプションを conf/keycloak.conf に書いておき、上書き設定したいものをユニットファイルの環境変数で設定するといった使い分けが可能
-    - `kc.sh export` など他のサブコマンドを実行する際は、正しいDBに接続するために conf/keycloak.conf にDB接続情報を書いておいた方がよい
+  - JDBC_PINGの設定を行うキャッシュ定義のXMLファイルはInfinispanの設定であってKeycloakの設定ではないのでコマンドラインオプションやkeycloak.confの内容を見ることはできないため、keycloak.confとは別に二重に設定が必要
+    - Keycloak 26.1あたりでJDBC_PINGがデフォルトになりkeycloak.confのみの設定でよくなる予定
 - レルムの自動インポートも可能
   - data/import/ 内にレルムのJSONファイルを置き、`--import-realm` オプションを追加することで起動時に自動インポートさせることも可能
     - https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/26.0/html-single/server_configuration_guide/index#importExport-importing-a-realm-during-startup
