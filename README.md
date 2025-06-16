@@ -2,7 +2,7 @@
 
 Red Hat build of Keycloak (RHBK) 26.0 を使用するが、アーカイブやそれを解凍したディレクトリ名が異なるだけでコミュニティ版のKeycloakでも同様。
 なお、Keycloak 26 からバージョニングが変わり、約3ヶ月毎にマイナーバージョンが上がるようになった([Backwards compatibility in Keycloak releases](https://www.keycloak.org/2024/10/release-updates))。
-製品版のRHBKは偶数マイナーバージョンが採用され、26.0の次は26.2になる予定である。
+製品版のRHBKは偶数マイナーバージョンが採用され、26.0の次が26.2である。
 
 ## HTTPSの使用について
 
@@ -50,15 +50,9 @@ bin/kc.sh start --https-certificate-file=/path/to/certfile.pem --https-certifica
 - DBとしてPostgreSQLを使用
   - 既に起動済みでユーザ名、パスワード、JDBC URLの接続情報を持っていること
   - ローカル環境ならDocker or Podmanで `docker run -e POSTGRES_USER=keycloak -e POSTGRES_PASSWORD=password -e POSTGRES_DB=keycloak --name kcpostgres -p 5432:5432 -d docker.io/library/postgres:16` のように用意することも可能
-- Infinispanキャッシュのクラスタリングの設定としてJDBC_PINGを使用
-  - デフォルトではUDPマルチキャストを使うが、この場合マルチキャストの届く範囲で起動したKeycloakは全て一つのクラスタに参加しようとしてしまう
-  - UDPマルチキャストの代わりにJDBC_PINGを設定し、上記で用意した同じPostgreSQLを使うよう設定する。この場合は同じDBを設定したKeycloakがクラスタメンバーとなる
-    - 参考までに Keycloak 26.1 からはJDBC_PINGがデフォルトになり、クラスタリングのためにcache-ispn.xmlを編集することは不要になる予定
 - Systemdのサービスとして起動
 - Keycloakの設定は keycloak.conf を使用
   - Keycloakの設定項目はコマンドラインオプション、環境変数、conf/keycloak.confの順で優先順位を持つ（最初の方が優先で後の方の設定を上書きできる）
-  - JDBC_PINGの設定を行うキャッシュ定義のXMLファイルはInfinispanの設定であってKeycloakの設定ではないのでコマンドラインオプションやkeycloak.confの内容を見ることはできないため、keycloak.confとは別に二重に設定が必要
-    - Keycloak 26.1あたりでJDBC_PINGがデフォルトになりkeycloak.confのみの設定でよくなる予定
 - レルムの自動インポートも可能
   - data/import/ 内にレルムのJSONファイルを置き、`--import-realm` オプションを追加することで起動時に自動インポートさせることも可能
     - https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/26.0/html-single/server_configuration_guide/index#importExport-importing-a-realm-during-startup

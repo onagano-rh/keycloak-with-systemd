@@ -5,7 +5,7 @@ Wants=keycloak-log-delete.timer
 [Service]
 Type=oneshot
 
-WorkingDirectory = /opt/keycloak/rhbk-26.0.9
+WorkingDirectory = /opt/keycloak/rhbk-26.2.5
 
 ExecStart= du -hs ./data/log
 ExecStart= find   ./data/log -type f -mtime +7 -ls -exec rm {} \;
