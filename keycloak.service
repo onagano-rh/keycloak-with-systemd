@@ -12,13 +12,12 @@ Environment = JAVA_HOME=/usr/lib/jvm/java-21
 
 # Override default values in kc.sh
 Environment = JAVA_OPTS="\
+  -XX:InitialRAMPercentage=10 -XX:MaxRAMPercentage=10 \
   -XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/urandom \
   -XX:+UseG1GC -XX:FlightRecorderOptions=stackdepth=512 \
   # GC log
   -Xlog:gc*:file=./data/log/gc.log:time,uptimemillis:filecount=5,filesize=3M \
 "
-
-Environment = JAVA_OPTS_KC_HEAP="-XX:InitialRAMPercentage=10 -XX:MaxRAMPercentage=10"
 
 # Other JVM options: define bind_addr if you have multiple NICs
 #Environment = JAVA_OPTS_APPEND=-Djgroups.bind_addr=192.168.1.10
