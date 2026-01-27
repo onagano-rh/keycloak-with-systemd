@@ -6,19 +6,16 @@ After=network.target
 [Service]
 Type=exec
 
-WorkingDirectory = /opt/keycloak/rhbk-26.2.5
+WorkingDirectory = /opt/keycloak/rhbk-26.4.7
 
 Environment = JAVA_HOME=/usr/lib/jvm/java-21
 
 # Override default values in kc.sh
-Environment = JAVA_OPTS="\
-  -XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/urandom \
-  -XX:+UseG1GC -XX:FlightRecorderOptions=stackdepth=512 \
+Environment = JAVA_OPTS_KC_HEAP="\
+  -XX:InitialRAMPercentage=10 -XX:MaxRAMPercentage=10 \
   # GC log
   -Xlog:gc*:file=./data/log/gc.log:time,uptimemillis:filecount=5,filesize=3M \
 "
-
-Environment = JAVA_OPTS_KC_HEAP="-XX:InitialRAMPercentage=10 -XX:MaxRAMPercentage=10"
 
 # Other JVM options: define bind_addr if you have multiple NICs
 #Environment = JAVA_OPTS_APPEND=-Djgroups.bind_addr=192.168.1.10
@@ -26,6 +23,7 @@ Environment = JAVA_OPTS_KC_HEAP="-XX:InitialRAMPercentage=10 -XX:MaxRAMPercentag
 LimitNOFILE=infinity
 LimitNPROC=infinity
 
+# Comment out for user-level systemd
 User=keycloak
 Group=keycloak
 
@@ -40,4 +38,6 @@ ExecStart = sh -c "exec ./bin/kc.sh start --import-realm"
 SuccessExitStatus=143
 
 [Install]
-WantedBy=multi-user.target default.target
+WantedBy=multi-user.target
+# For user-level systemd, use the default target
+#WantedBy=default.target

@@ -1,8 +1,11 @@
 # KeyclaokをSystemdのサービスとして起動する方法
 
-Red Hat build of Keycloak (RHBK) 26.0 を使用するが、アーカイブやそれを解凍したディレクトリ名が異なるだけでコミュニティ版のKeycloakでも同様。
-なお、Keycloak 26 からバージョニングが変わり、約3ヶ月毎にマイナーバージョンが上がるようになった([Backwards compatibility in Keycloak releases](https://www.keycloak.org/2024/10/release-updates))。
+Red Hat build of Keycloak (RHBK) 26.4 を使用するが、アーカイブやそれを解凍したディレクトリ名が異なるだけでコミュニティ版のKeycloakでも同様。
+なお、Keycloak 26 からバージョニングが変わり、約3ヶ月毎にマイナーバージョンが上がるようになった。
 製品版のRHBKは偶数マイナーバージョンが採用され、26.0の次が26.2である。
+
+- [Backwards compatibility in Keycloak releases](https://www.keycloak.org/2024/10/release-updates)
+- [Red Hat build of Keycloak ライフサイクルとサポートポリシー](https://access.redhat.com/support/policy/updates/red_hat_build_of_keycloak_notes)
 
 ## HTTPSの使用について
 
@@ -39,7 +42,7 @@ Javaのキーストアのファイルパスとそのパスワードをデフォ�
 bin/kc.sh start --https-certificate-file=/path/to/certfile.pem --https-certificate-key-file=/path/to/keyfile.pem --hostname=<証明書のSANに設定したホスト名>
 ```
 
-公式ドキュメント: https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/26.0/html-single/server_configuration_guide/index#enabletls-
+公式ドキュメント: https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/26.4/html-single/server_configuration_guide/index#enabletls-
 
 ## プロダクション環境に近い設定での起動方法
 
@@ -49,13 +52,13 @@ bin/kc.sh start --https-certificate-file=/path/to/certfile.pem --https-certifica
   - キーストアもしくはPEM形式で証明書を持っていること
 - DBとしてPostgreSQLを使用
   - 既に起動済みでユーザ名、パスワード、JDBC URLの接続情報を持っていること
-  - ローカル環境ならDocker or Podmanで `docker run -e POSTGRES_USER=keycloak -e POSTGRES_PASSWORD=password -e POSTGRES_DB=keycloak --name kcpostgres -p 5432:5432 -d docker.io/library/postgres:16` のように用意することも可能
+  - ローカル環境ならDocker or Podmanで `docker run -e POSTGRES_USER=keycloak -e POSTGRES_PASSWORD=password -e POSTGRES_DB=keycloak --name kcpostgres -p 5432:5432 -d docker.io/library/postgres:17` のように用意することも可能
 - Systemdのサービスとして起動
 - Keycloakの設定は keycloak.conf を使用
   - Keycloakの設定項目はコマンドラインオプション、環境変数、conf/keycloak.confの順で優先順位を持つ（最初の方が優先で後の方の設定を上書きできる）
 - レルムの自動インポートも可能
   - data/import/ 内にレルムのJSONファイルを置き、`--import-realm` オプションを追加することで起動時に自動インポートさせることも可能
-    - https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/26.0/html-single/server_configuration_guide/index#importExport-importing-a-realm-during-startup
+    - https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/26.4/html-single/server_configuration_guide/index#importExport-importing-a-realm-during-startup
   - 同名のレルムが存在する場合はインポートしない
   - レルムのJSONファイルは部分的なものでもよく、またパスワードは平文であってもよい
     - 例: https://github.com/keycloak/keycloak/blob/18.0.2/examples/js-console/example-realm.json
@@ -69,12 +72,12 @@ $ mkdir /opt/keycloak
 $ cd /opt/keycloak
 
 # カスタマーポータルよりダウンロードしたRHBKのアーカイブを解凍(コミュニティ版のkeycloak-*.zipでも同様)
-$ unzip -q /path/to/rhbk-26.0.9.zip
-$ ls /opt/keycloak/rhbk-26.0.9
+$ unzip -q /path/to/rhbk-26.4.7.zip
+$ ls /opt/keycloak/rhbk-26.4.7
 bin  conf  lib  LICENSE.txt  providers  README.md  themes  version.txt
 
 # ここがいわゆる KC_HOME になる。アップグレード時には /opt/keycloak 以下にKC_HOMEを増やしていくとよい
-$ cd /opt/keycloak/rhbk-26.0.9
+$ cd /opt/keycloak/rhbk-26.4.7
 
 # 本リポジトリのファイルをコピー
 $ cp /path/to/conf/* conf/
@@ -111,16 +114,16 @@ $ systemctl daemon-reload
 
 Quarkus版のKeycloakはWildFly版にはあったリクエストパスやIPアドレスによるアクセス制限ができないため、
 /admin, /health, /metrics といったパスのアクセス制限を行うために前段にリバースプロキシを起き、
-HTTPSを一旦ほどいて[パス名によるアクセス制限](https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/26.0/html-single/server_configuration_guide/index#reverseproxy-exposed-path-recommendations)を行う必要がある。
+HTTPSを一旦ほどいて[パス名によるアクセス制限](https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/26.4/html-single/server_configuration_guide/index#reverseproxy-exposed-path-recommendations)を行う必要がある。
 
 リバースプロキシ・Keycloak間をHTTPで済ませるなら `http-enabled=true` を指定してHTTPSではなくHTTPを使うようにする。
 この時ブラウザのIPアドレスを伝えるためにリバースプロキシが使用するヘッダーに合わせて `proxy-headers=forwarded` のような
-[設定](https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/26.0/html-single/server_configuration_guide/index#reverseproxy-)も追加する。
+[設定](https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/26.4/html-single/server_configuration_guide/index#reverseproxy-)も追加する。
 
 - `health-enabled` および `metrics-enabled` を有効にしないなら /health, /metrics は機能しないのでブロックする必要はない
   - Keycloak 25からは management port が導入され8080ではなく9000でこれらのエンドポイントが提供されるようになったのでポート番号ベースのアクセス制限も可能になった
 - 管理コンソール (/admin) に対してはホスト名ベースのアクセス制限なら `hostname-admin` オプションで設定可能
-  - https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/24.0/html/server_guide/hostname-#hostname-administration-console
+  - https://docs.redhat.com/ja/documentation/red_hat_build_of_keycloak/26.4/html-single/server_configuration_guide/index#hostname-exposing-the-administration-console-on-a-separate-hostname
 
 ## 古いログファイルの削除方法について
 
